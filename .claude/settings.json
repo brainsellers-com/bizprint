@@ -1,18 +1,21 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "env": {
     "CLAUDE_CODE_USE_POWERSHELL_TOOL": "1"
   },
   "defaultShell": "powershell",
   "permissions": {
-    "deny": [
-      "Bash"
-    ],
     "allow": [
+      "Skill(*)",
       "Read(*)",
       "Glob(*)",
       "Grep(*)",
       "PowerShell(cd *)",
-      "PowerShell(ls *)",
+      "PowerShell(Get-ChildItem *)",
+      "PowerShell(file *)",
+      "PowerShell(wc *)",
+      "PowerShell(which *)",
+      "PowerShell(git *)",
       "PowerShell(mvn clean*)",
       "PowerShell(mvn test*)",
       "PowerShell(mvn package*)",
@@ -21,69 +24,65 @@
       "PowerShell(mvn install*)",
       "PowerShell(mvn checkstyle:*)",
       "PowerShell(mvn editorconfig:*)",
-      "PowerShell(which *)",
-      "PowerShell(git status*)",
-      "PowerShell(git log*)",
-      "PowerShell(git diff*)",
-      "PowerShell(git add*)",
-      "PowerShell(git commit*)",
-      "PowerShell(git push*)",
-      "PowerShell(git pull*)",
-      "PowerShell(git fetch*)",
-      "PowerShell(git checkout*)",
-      "PowerShell(git switch*)",
-      "PowerShell(git branch*)",
-      "PowerShell(git rev-parse*)",
-      "PowerShell(git tag*)",
-      "PowerShell(git stash*)",
-      "PowerShell(git rm*)",
-      "PowerShell(git -C*)",
       "PowerShell(tasklist*)",
       "PowerShell(gh issue list*)",
       "PowerShell(gh issue view*)",
       "PowerShell(gh issue create*)",
+      "PowerShell(gh issue close*)",
       "PowerShell(gh pr list*)",
       "PowerShell(gh pr view*)",
       "PowerShell(gh pr create*)",
       "PowerShell(gh pr diff*)",
       "PowerShell(gh pr comment*)",
       "PowerShell(gh pr merge*)",
-      "PowerShell(gh run list*)",
-      "PowerShell(gh run view*)",
-      "PowerShell(gh api repos/*/issues*)",
-      "PowerShell(gh api repos/*/pulls*)",
-      "PowerShell(gh api repos/*/comments*)",
-      "PowerShell(gh repo view*)",
-      "PowerShell(gh release list*)"
+      "PowerShell(gh pr review*)",
+      "PowerShell(gh pr checks*)",
+      "PowerShell(gh run *)",
+      "PowerShell(gh api*)"
+    ],
+    "deny": [
+      "Bash",
+      "PowerShell(mvn deploy*)",
+      "Read(~/.ssh/**)",
+      "Edit(~/.ssh/**)",
+      "Read(~/.gnupg/**)",
+      "Edit(~/.gnupg/**)",
+      "Read(~/.aws/**)",
+      "Edit(~/.aws/**)",
+      "Read(~/.azure/**)",
+      "Edit(~/.azure/**)",
+      "Read(~/.kube/**)",
+      "Edit(~/.kube/**)",
+      "Read(~/.npmrc)",
+      "Edit(~/.npmrc)",
+      "Read(~/.git-credentials)",
+      "Edit(~/.git-credentials)",
+      "Read(~/.config/gh/**)",
+      "Edit(~/.config/gh/**)",
+      "Read(~/.bashrc)",
+      "Edit(~/.bashrc)",
+      "Read(~/.zshrc)",
+      "Edit(~/.zshrc)",
+      "Read(*.env)",
+      "Edit(*.env)",
+      "Read(.env)",
+      "Edit(.env)",
+      "Read(.env.*)",
+      "Edit(.env.*)"
     ]
   },
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "& \"$env:CLAUDE_PROJECT_DIR/.claude/scripts/guard-main-branch.ps1\"",
-            "shell": "powershell"
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "Set-Location $env:CLAUDE_PROJECT_DIR; Write-Output '=== 作業コンテキスト ==='; Write-Output \"ブランチ: $(git rev-parse --abbrev-ref HEAD 2>$null)\"; Write-Output '--- 最近のコミット (5件) ---'; git log --oneline -5 2>$null; Write-Output '--- 変更中のファイル ---'; git status --short 2>$null; Write-Output '==='",
-            "shell": "powershell"
-          }
-        ]
-      }
-    ]
+  "extraKnownMarketplaces": {
+    "brainsellers-com": {
+      "source": {
+        "source": "github",
+        "repo": "brainsellers-com/bs-cc-plugins"
+      },
+      "autoUpdate": true
+    }
   },
   "enabledPlugins": {
     "claude-md-management@claude-plugins-official": true,
-    "skill-creator@claude-plugins-official": true
+    "skill-creator@claude-plugins-official": true,
+    "bs-cc-plugins@brainsellers-com": true
   }
 }
