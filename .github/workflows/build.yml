@@ -32,7 +32,7 @@ jobs:
     runs-on: [self-hosted, windows-public-runner]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Check Java version
         run: java -version
@@ -41,7 +41,7 @@ jobs:
         run: mvn clean install -B
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: build-artifacts
           path: |
