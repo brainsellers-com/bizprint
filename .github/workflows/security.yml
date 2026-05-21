@@ -1,0 +1,77 @@
+name: Security Scan
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    name: SAST (Semgrep)
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Semgrep
+        run: semgrep scan --config auto --sarif --output semgrep-results.sarif
+        env:
+          SEMGREP_RULES: >-
+            p/java
+            p/csharp
+            p/owasp-top-ten
+            p/sql-injection
+            p/xss
+            p/xxe
+
+      - name: Upload SARIF artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-sarif
+          path: semgrep-results.sarif
+          retention-days: 30
+
+  gitleaks:
+    name: Secret Detection (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Gitleaks
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in 1 2 3; do
+            LATEST=$(gh api repos/gitleaks/gitleaks/releases/latest --jq '.tag_name' | sed 's/^v//') && break
+            echo "Retry $i: failed to fetch latest version"
+            sleep $((i * 10))
+          done
+          if [ -z "$LATEST" ]; then
+            echo "::error::Failed to fetch gitleaks latest version after 3 retries"
+            exit 1
+          fi
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${LATEST}/gitleaks_${LATEST}_linux_x64.tar.gz" -o gitleaks.tar.gz
+          tar xzf gitleaks.tar.gz
+          sudo mv gitleaks /usr/local/bin/
+
+      - name: Run Gitleaks (PR - diff only)
+        if: github.event_name == 'pull_request'
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: gitleaks detect --source . --log-opts="${PR_BASE_SHA}..${PR_HEAD_SHA}" --verbose
+
+      - name: Run Gitleaks (push/schedule - latest commit)
+        if: github.event_name != 'pull_request'
+        run: gitleaks detect --source . --log-opts="-1" --verbose

@@ -1,0 +1,36 @@
+name: 変更サマリー
+description: モジュール改修時の変更サマリー（QAチームへの起点情報）
+labels: ["change-summary"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: 何を変えたか
+      description: 変更内容の概要（1〜3文）
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: なぜ変えたか
+      description: 変更の動機・背景（顧客要望、バグ報告、技術的負債等）
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: 影響範囲
+      description: |
+        変更が影響するモジュール・機能の見立て（開発者視点でのベストエフォート）。
+        「絶対にこれだけ」ではなく「少なくともこのあたり」という位置づけ。
+      placeholder: |
+        - bizprint-server-java: 〇〇処理
+        - bizprint-client: 〇〇処理
+  - type: textarea
+    id: notes
+    attributes:
+      label: 注意点
+      description: テスト時に留意すべきエッジケースや制約
+      placeholder: |
+        - 〇〇の場合は△△になる
+        - □□との組み合わせは未検証

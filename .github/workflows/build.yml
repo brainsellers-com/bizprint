@@ -4,10 +4,32 @@ on:
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - 'docs/**'
+      - 'sample/**'
+      - '.claude/**'
+      - '.github/**'
+      - '!.github/workflows/build.yml'
+      - '*.md'
+      - 'LICENSE'
+      - '.editorconfig'
+      - '.gitattributes'
+      - '.gitignore'
   push:
     branches:
       - main
-  workflow_dispatch: # 手動実行も可能
+    paths-ignore:
+      - 'docs/**'
+      - 'sample/**'
+      - '.claude/**'
+      - '.github/**'
+      - '!.github/workflows/build.yml'
+      - '*.md'
+      - 'LICENSE'
+      - '.editorconfig'
+      - '.gitattributes'
+      - '.gitignore'
+  workflow_dispatch:
 
 permissions:
   contents: read
