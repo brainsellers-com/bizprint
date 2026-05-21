@@ -4,10 +4,24 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - 'bizprint-server-java/**'
+      - 'bizprint-server-csharp/**'
+      - 'bizprint-client/**'
+      - 'config/**'
+      - 'pom.xml'
+      - '.github/workflows/build.yml'
   push:
     branches:
       - main
-  workflow_dispatch: # 手動実行も可能
+    paths:
+      - 'bizprint-server-java/**'
+      - 'bizprint-server-csharp/**'
+      - 'bizprint-client/**'
+      - 'config/**'
+      - 'pom.xml'
+      - '.github/workflows/build.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
