@@ -1,13 +1,12 @@
+---
+version: "1.0.0"
+---
+
 # PR 承認・マージ運用ルール
 
 ## 承認権限
 
-PR の承認・マージは **責任者のみ** が行う。
-
-| PR の変更対象 | 承認・マージ権限 |
-|---|---|
-| `docs/` 配下のみの変更 | 作成者本人が承認・マージ可 |
-| 上記以外（ソースコード、インフラ、設定等） | **責任者のみ** |
+PR の承認・マージは **責任者のみ** が行う。変更対象による例外はない。
 
 ## Claude Code の振る舞い
 
@@ -24,11 +23,22 @@ PR の承認・マージは **責任者のみ** が行う。
 
 ## 承認・マージ手順（`/approve-pr` スキル）
 
-責任者または委任された担当者が実行する手順:
+責任者が実行する手順。PR 作成者が責任者自身かどうかで分岐する。
+
+### 共通の前提条件
 
 1. pr-reviewer のレビュー結果が LGTM であることを確認
-2. CI パイプラインが success であることを確認
-3. `gh pr review <PR番号> --approve` で承認
-4. `gh pr merge <PR番号> --merge --delete-branch` でマージ
-5. `gh pr view <PR番号>` で `state: MERGED` を確認
-6. main ブランチに戻って `git pull`
+2. CI が pass であることを確認
+
+### PR 作成者 ≠ 責任者の場合（通常フロー）
+
+1. `gh pr review <PR番号> --approve` で承認
+2. `gh pr merge <PR番号> --merge --delete-branch` でマージ
+3. `gh pr view <PR番号> --json state --jq ".state"` で `MERGED` を確認
+
+### PR 作成者 ＝ 責任者の場合（バイパスマージ）
+
+GitHub では自分が作成した PR を自分で承認できないため、`--admin` でブランチ保護ルールをバイパスして直接マージする。
+
+1. `gh pr merge <PR番号> --merge --delete-branch --admin` でバイパスマージ
+2. `gh pr view <PR番号> --json state --jq ".state"` で `MERGED` を確認
