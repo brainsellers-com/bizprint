@@ -55,11 +55,7 @@ Git 管理から除外されてしまう。
 複数スキルで共通する手順を `_shared/` に切り出し、各スキルから `@_shared/<ファイル名>` で参照する。
 
 <!-- {{SHARED_PARTS_TABLE}} — PJ固有の _shared ファイル一覧をテーブルで記載 -->
-| ファイル | 内容 | 参照元 |
-|---|---|---|
-| `agent-result-display.md` | エージェント結果表示の共通手順 | `self-audit` |
-| `pr-reviewer-launch.md` | pr-reviewer エージェント起動手順 | `create-pr` |
-| `ci-monitor.md` | CI 監視の共通手順 | `create-pr` |
+（なし — プラグイン移管により全ファイル削除済み）
 <!-- END {{SHARED_PARTS_TABLE}} -->
 
 ## カスタムエージェント（.claude/agents/）
