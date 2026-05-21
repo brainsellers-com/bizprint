@@ -1,33 +1,47 @@
-/bizprint-server-csharp/src/obj
-/bizprint-server-csharp/src/bin
-/bizprint-server-csharp/src/.vs
-/bizprint-server-java/.classpath
-/bizprint-server-java/.settings
-/bizprint-server-java/target
-/bizprint-server-java/.project
-/bizprint-server-csharp/.project
-/bizprint-server-csharp/.settings
-/bizprint-server-csharp/target
-/bizprint-client/.project
-/bizprint-client/.settings
-/bizprint-client/target
-/bizprint-client/src/.vs
-/bizprint-client/src/BatchPrintInstaller/Output
-/bizprint-client/src/BatchPrintService/obj
-/bizprint-client/src/BatchPrintService/bin
-/bizprint-client/src/BizCommonTests/obj
-/bizprint-client/src/BizCommonTests/bin
-/bizprint-client/src/BizPrintCommon/obj
-/bizprint-client/src/BizPrintCommon/bin
-/bizprint-client/src/BizPrintHealthChecker/obj
-/bizprint-client/src/BizPrintHealthChecker/bin
-/bizprint-client/src/DirectPrintInstaller/Output
-/bizprint-client/src/DirectPrintService/obj
-/bizprint-client/src/DirectPrintService/bin
-/bizprint-client/src/SilentPdfPrinter/obj
-/bizprint-client/src/SilentPdfPrinter/bin
-/bizprint-client/src/SppFileExtractTool/obj
-/bizprint-client/src/SppFileExtractTool/bin
-/build/target
-/build/.settings
-/build/.project
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea/*
+!.idea/checkstyle-idea.xml
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Visual Studio ###
+**/bin/
+**/obj/
+**/.vs/
+*.suo
+
+### Inno Setup ###
+**/Output/
+
+### Claude Code ###
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+.claude/worktrees/
