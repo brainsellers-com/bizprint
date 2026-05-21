@@ -1,4 +1,4 @@
-name: Security Scan
+name: セキュリティスキャン
 
 on:
   pull_request:
@@ -50,18 +50,9 @@ jobs:
 
       - name: Install Gitleaks
         env:
-          GH_TOKEN: ${{ github.token }}
+          GITLEAKS_VERSION: "8.30.1"
         run: |
-          for i in 1 2 3; do
-            LATEST=$(gh api repos/gitleaks/gitleaks/releases/latest --jq '.tag_name' | sed 's/^v//') && break
-            echo "Retry $i: failed to fetch latest version"
-            sleep $((i * 10))
-          done
-          if [ -z "$LATEST" ]; then
-            echo "::error::Failed to fetch gitleaks latest version after 3 retries"
-            exit 1
-          fi
-          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${LATEST}/gitleaks_${LATEST}_linux_x64.tar.gz" -o gitleaks.tar.gz
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" -o gitleaks.tar.gz
           tar xzf gitleaks.tar.gz
           sudo mv gitleaks /usr/local/bin/
 

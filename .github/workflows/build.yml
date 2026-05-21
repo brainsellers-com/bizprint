@@ -4,31 +4,23 @@ on:
   pull_request:
     branches:
       - main
-    paths-ignore:
-      - 'docs/**'
-      - 'sample/**'
-      - '.claude/**'
-      - '.github/**'
-      - '!.github/workflows/build.yml'
-      - '*.md'
-      - 'LICENSE'
-      - '.editorconfig'
-      - '.gitattributes'
-      - '.gitignore'
+    paths:
+      - 'bizprint-server-java/**'
+      - 'bizprint-server-csharp/**'
+      - 'bizprint-client/**'
+      - 'config/**'
+      - 'pom.xml'
+      - '.github/workflows/build.yml'
   push:
     branches:
       - main
-    paths-ignore:
-      - 'docs/**'
-      - 'sample/**'
-      - '.claude/**'
-      - '.github/**'
-      - '!.github/workflows/build.yml'
-      - '*.md'
-      - 'LICENSE'
-      - '.editorconfig'
-      - '.gitattributes'
-      - '.gitignore'
+    paths:
+      - 'bizprint-server-java/**'
+      - 'bizprint-server-csharp/**'
+      - 'bizprint-client/**'
+      - 'config/**'
+      - 'pom.xml'
+      - '.github/workflows/build.yml'
   workflow_dispatch:
 
 permissions:
