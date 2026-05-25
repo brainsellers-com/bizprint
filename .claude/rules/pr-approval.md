@@ -1,5 +1,7 @@
 ---
 version: "1.0.0"
+has_placeholders: false
+description: "PR 承認・マージ運用ルール（責任者のみ）"
 ---
 
 # PR 承認・マージ運用ルール
