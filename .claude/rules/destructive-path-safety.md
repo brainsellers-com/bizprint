@@ -1,5 +1,7 @@
 ---
 version: "1.1.0"
+has_placeholders: false
+description: "PowerShell Remove-Item の安全ガード（変数 null 化事故の防止）"
 ---
 
 # 破壊的パス削除の安全ガード

@@ -1,5 +1,7 @@
 ---
 version: "1.1.0"
+has_placeholders: false
+description: "PowerShell 実行環境ルール（UTF-8、エイリアス禁止、パイプ注意、Python UTF-8）"
 ---
 
 # PowerShell 実行環境ルール

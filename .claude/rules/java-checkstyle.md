@@ -1,5 +1,7 @@
 ---
 version: "1.1.1"
+has_placeholders: false
+description: "Java CheckStyle 準拠ルール（コミット前確認・ボーイスカウトルール・違反パターン・EditorConfig）"
 globs:
   - "bizprint-server-java/**/*.java"
   - "config/checkstyle/**"

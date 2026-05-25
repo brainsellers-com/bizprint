@@ -1,5 +1,7 @@
 ---
 version: "1.1.0"
+has_placeholders: false
+description: "gh コマンド運用ルール（Issue/PR/CI/API）"
 ---
 
 # gh コマンド運用ルール
