@@ -2,14 +2,15 @@
 version: "1.1.1"
 has_placeholders: false
 description: "Java CheckStyle 準拠ルール（コミット前確認・ボーイスカウトルール・違反パターン・EditorConfig）"
-globs:
+paths:
+  - "**/*.java"
   - "bizprint-server-java/**/*.java"
   - "config/checkstyle/**"
 ---
 
 # Java コーディングルール（CheckStyle 準拠）
 
-> このルールは `globs` により Java ファイル変更時に自動適用される。EditorConfig セクションは非 Java ファイルにも関係するが、Java 変更のついでに確認する運用を想定している。
+> このルールは `paths: ["**/*.java"]` により Java ファイル変更時に自動適用される。EditorConfig セクションは非 Java ファイルにも関係するが、Java 変更のついでに確認する運用を想定している。
 
 ## MUST
 - Java コードの追加・修正は `config/checkstyle/checkstyle.xml` に準拠すること。

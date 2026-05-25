@@ -4,6 +4,8 @@ has_placeholders: true
 description: "セキュリティ制約（機密情報管理・認証・バリデーション）"
 paths:
   - "**/src/main/java/**/*.java"
+  - "bizprint-server-csharp/**/*.cs"
+  - "bizprint-client/**/*.cs"
 ---
 
 # セキュリティ制約
