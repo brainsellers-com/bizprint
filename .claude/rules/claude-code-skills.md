@@ -1,9 +1,7 @@
 ---
-version: "1.3.0"
+version: "1.3.1"
 has_placeholders: true
 description: "Claude Code スキル設定ルール（ディレクトリ構成・フロントマター・登録一覧・プラグイン優先順位）"
-globs:
-  - ".claude/skills/**"
 ---
 
 # Claude Code スキル設定ルール
