@@ -1,5 +1,5 @@
 ---
-version: "1.1.0"
+version: "1.2.1"
 has_placeholders: false
 description: "gh コマンド運用ルール（Issue/PR/CI/API）"
 ---
@@ -73,10 +73,10 @@ $desc = @'
 ## 概要
 ...
 '@
-gh pr create --title "<title>" --body $desc --base develop
+gh pr create --title "<title>" --body $desc --base <ターゲットブランチ>
 ```
-- `--base` でマージ先ブランチを指定。
-- ソースブランチの削除はマージ時に `--delete-branch` で指定する（作成時は不要）。
+- `--base` でマージ先ブランチを指定。`<ターゲットブランチ>` はPJのメインブランチ（`main` / `develop` / `v5.2_BS` 等、PJごとに異なる）に置き換える。
+- ソースブランチの削除はマージ後に `git push origin --delete <ブランチ名>` で行う（作成時は不要）。
 
 ### 既存 PR の確認
 ```powershell
@@ -121,8 +121,20 @@ gh pr review <PR番号> --approve
 ```
 
 ### 通常マージ（承認後）
+
+マージ・確認・ブランチ削除は同一 PowerShell ブロック内で実行すること（変数はブロック間で保持されない）。
+
 ```powershell
-gh pr merge <PR番号> --merge --delete-branch
+# headRefName は merge より前に取得する（マージ後にブランチ削除済みだと取得できなくなるリスクを回避）
+$prSource = gh pr view <PR番号> --json headRefName --jq ".headRefName"
+gh pr merge <PR番号> --merge
+$state = gh pr view <PR番号> --json state --jq ".state"
+# MERGED を確認できた場合のみブランチ削除（確認失敗時は削除しない）
+if ($state -eq "MERGED") {
+    git push origin --delete $prSource
+} else {
+    Write-Output "ERROR: PR の state が MERGED ではありません ('$state')。ブランチ削除を中止します。"
+}
 ```
 
 ### バイパスマージ（自分が作成した PR）
@@ -130,8 +142,18 @@ gh pr merge <PR番号> --merge --delete-branch
 GitHub では自分が作成した PR を自分で承認できない。
 PR 作成者＝責任者の場合、`--admin` でブランチ保護ルールをバイパスして直接マージする。
 
+通常マージと同様に同一 PowerShell ブロック内で実行すること。
+
 ```powershell
-gh pr merge <PR番号> --merge --delete-branch --admin
+$prSource = gh pr view <PR番号> --json headRefName --jq ".headRefName"
+gh pr merge <PR番号> --merge --admin
+$state = gh pr view <PR番号> --json state --jq ".state"
+# MERGED を確認できた場合のみブランチ削除（確認失敗時は削除しない）
+if ($state -eq "MERGED") {
+    git push origin --delete $prSource
+} else {
+    Write-Output "ERROR: PR の state が MERGED ではありません ('$state')。ブランチ削除を中止します。"
+}
 ```
 
 - `--admin` は Repository Admin 以上の権限が必要。
