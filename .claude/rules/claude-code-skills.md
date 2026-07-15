@@ -1,5 +1,5 @@
 ---
-version: "1.3.1"
+version: "1.5.0"
 has_placeholders: true
 description: "Claude Code スキル設定ルール（ディレクトリ構成・フロントマター・登録一覧・プラグイン優先順位）"
 ---
@@ -22,13 +22,15 @@ description: "Claude Code スキル設定ルール（ディレクトリ構成・
 ---
 name: skill-name
 description: スキルの説明
+model: sonnet
 effort: medium
 shell: powershell
 ---
 ```
 
-- `effort` と `shell` は必須。`effort` は `low` / `medium` / `high` から選択、`shell` は `powershell` を指定する。
-- `model` は **`opus` のみ指定可**。`sonnet` は指定禁止（親セッションが Opus 1M コンテキストで動作している場合、Sonnet 160k のコンテキスト制限でエラーになる）。Sonnet で動かしたい場合は `model` フィールド自体を省略する（省略時はデフォルトモデルが使われる）。※本制約はスキルのみ対象。エージェント（`.claude/agents/`）は独立コンテキストで動作するため `model` を自由に指定できる。
+- `model`, `effort`, `shell` は必須。
+- `model` は `sonnet` / `opus` のいずれかを指定する（**必須**）。`haiku` は禁止（200k コンテキストのため、1M の親セッションでコンテキストオーバーの懸念がある）。定型・オーケストレーション系のスキルは `sonnet`、複雑な設計・実装・レビューを行うスキルは `opus` を選択する。スキル・エージェント共通のルール。
+- `effort` は `low` / `medium` / `high` から選択。`shell` は `powershell` を指定する。
 
 ### スキルの必須セクション
 
@@ -91,6 +93,7 @@ Git 管理から除外されてしまう。
 | スキル | `design-prep` | 設計前提メモ作成（要件分析） |
 | スキル | `design-doc` | 設計書セット生成 |
 | スキル | `maven-build` | Maven ビルド実行 |
+| スキル | `dependabot-triage` | Dependabot PR トリアージ・統合 PR 作成・元 PR クローズ |
 | スキル | `sync-rules` | ルールテンプレート同期 |
 | スキル | `init-project` | プロジェクト初期セットアップ |
 | スキル | `tf-coverage-check` | Terraform カバレッジ確認 |
