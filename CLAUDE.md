@@ -81,6 +81,20 @@ mvn editorconfig:check -pl bizprint-server-java
 - CI が通っていない PR はマージしない。
 - **PR 承認は責任者のみ**。詳細: `.claude/rules/pr-approval.md`
 
+## イシューラベル付与ルール
+
+詳細は `.claude/rules/issue-labels.md` を参照。
+
+### 新規イシュー作成時
+
+| ブランチプレフィックス | type ラベル |
+|---|---|
+| `feature/` | `type: feature`（新規）または `type: enhancement`（既存改善） |
+| `bugfix/` `hotfix/` | `type: bug` |
+| `chore/` `docs/` `refactor/` `test/` | `type: task` |
+
+`comp: *` はイシュー内容から判定する。横断タスクは `comp: general`。
+
 ## コミットメッセージ規約
 - フォーマット: `<プレフィックス> <変更内容の要約（日本語）> (#<イシュー番号>)`
 - プレフィックス: `feat:` / `fix:` / `chore:` / `docs:` / `refactor:` / `test:`
