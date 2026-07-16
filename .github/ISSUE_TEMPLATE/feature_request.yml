@@ -1,6 +1,6 @@
 name: 機能要望
 description: 新機能や改善の提案をする
-labels: ["enhancement"]
+labels: ["type: enhancement"]
 body:
   - type: markdown
     attributes:
@@ -34,15 +34,20 @@ body:
       required: false
 
   - type: dropdown
-    id: module
+    id: component
     attributes:
-      label: 対象モジュール
-      description: 該当するモジュールを選択してください。
+      label: コンポーネント
+      description: 該当するコンポーネントを選択してください。
       options:
-        - bizprint-server-java
-        - bizprint-server-csharp
-        - bizprint-client
-        - その他
+        - server-java（bizprint-server-java）
+        - server-csharp（bizprint-server-csharp）
+        - client（bizprint-client）
+        - ci（GitHub Actions・CI）
+        - docs（ドキュメント）
+        - claude（Claude Code スキル・ルール）
+        - sample（サンプルコード）
+        - general（横断・その他）
+        - 不明
     validations:
       required: true
 

@@ -1,0 +1,59 @@
+name: Issue Labeler
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  add-component-label:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            // nosemgrep: javascript.github-actions.security.audit.github-actions-untrusted-input
+            // context.payload.issue.body は github-script 内の JavaScript 変数アクセスであり、
+            // Actions のテンプレート式展開とは異なりスクリプトインジェクションのリスクはない。
+            // さらにホワイトリスト照合で出力値を制限している。
+            const body = context.payload.issue.body || '';
+
+            // issue form のコンポーネントドロップダウンの値を抽出する。
+            // issue form は "### コンポーネント\n\n<選択値>" の形式で本文に展開される。
+            const match = body.match(/### コンポーネント\s*\n\n(.+)/);
+            if (!match) {
+              console.log('コンポーネントフィールドが見つかりません（CLI 作成等）。スキップします。');
+              return;
+            }
+
+            const selected = match[1].trim();
+
+            if (selected === '不明' || selected === '_No response_' || selected === '') {
+              console.log(`コンポーネント選択が "${selected}" のためラベルを付与しません。`);
+              return;
+            }
+
+            // ドロップダウンの選択肢からラベル名を抽出する。
+            // 選択肢の形式: "server-java（bizprint-server-java）" → ラベル: "comp: server-java"
+            const compName = selected.split('（')[0].trim();
+
+            // ホワイトリスト照合（スクリプトインジェクション防止）
+            const validComps = [
+              'server-java', 'server-csharp', 'client', 'ci',
+              'docs', 'claude', 'sample', 'general'
+            ];
+            if (!validComps.includes(compName)) {
+              console.log(`コンポーネント名 "${compName}" がホワイトリストに一致しません。スキップします。`);
+              return;
+            }
+
+            const label = `comp: ${compName}`;
+            console.log(`コンポーネントラベルを付与: ${label}`);
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: [label]
+            });
