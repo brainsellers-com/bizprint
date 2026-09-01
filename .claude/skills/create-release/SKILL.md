@@ -1,7 +1,7 @@
 ---
 name: create-release
 description: GitHub リリースを作成する（タグを作成して push し、リリースワークフローを起動）。
-model: opus
+model: sonnet
 effort: low
 shell: powershell
 ---
