@@ -1,5 +1,5 @@
 ---
-version: "1.8.2"
+version: "1.8.3"
 has_placeholders: true
 description: "Claude Code スキル設定ルール（ディレクトリ構成・フロントマター・登録一覧・プラグイン優先順位）"
 ---
@@ -29,7 +29,7 @@ shell: powershell
 ```
 
 - `model`, `effort`, `shell` は必須。
-- `model` は `sonnet` / `opus` / `fable`、または `claude-opus-5-5` のような具体的なモデルID文字列を指定する（**必須**）。`haiku` は禁止（200k コンテキストのため、1M の親セッションでコンテキストオーバーの懸念がある）。モデル選択基準は下記「モデル選択基準」を参照。スキル・エージェント共通のルール。
+- `model` は `sonnet` / `opus`、または `claude-opus-5-5` のような具体的なモデルID文字列を指定する（**必須**）。`haiku` は禁止（200k コンテキストのため、1M の親セッションでコンテキストオーバーの懸念がある）。`fable` はユーザーが明示的に指定した場合のみ使用する。モデル選択基準は下記「モデル選択基準」を参照。スキル・エージェント共通のルール。
 - `effort` は `low` / `medium` / `high` から選択。`shell` は `powershell` を指定する。
 
 ### モデル選択基準
