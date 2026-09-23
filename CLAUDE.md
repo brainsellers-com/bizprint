@@ -77,7 +77,7 @@ mvn editorconfig:check -pl bizprint-server-java
 - コミット・プッシュ前に必ず `/bs-cc-plugins:maven-build` でローカルビルドを確認する（ドキュメントのみの変更を除く）。
 - PR 作成は `/bs-cc-plugins:create-pr` スキルに従う。
 - すべての変更は PR 経由で行う。
-- PR 本文に `Closes #<イシュー番号>` を記述してイシューと連携する。
+- PR 本文の「関連イシュー」に `#<イシュー番号>` を記述してイシューと連携する。closing keyword（`Closes` / `Fixes` / `Resolves`）は使わない（マージ時の自動クローズを防ぎ、CI 成功確認後に `/bs-cc-plugins:approve-pr` でクローズ判断するため）。
 - CI が通っていない PR はマージしない。
 - **PR 承認は責任者のみ**。詳細: `.claude/rules/pr-approval.md`
 
