@@ -1,5 +1,5 @@
 ---
-version: "1.8.3"
+version: "1.9.0"
 has_placeholders: true
 description: "Claude Code スキル設定ルール（ディレクトリ構成・フロントマター・登録一覧・プラグイン優先順位）"
 ---
@@ -22,21 +22,30 @@ description: "Claude Code スキル設定ルール（ディレクトリ構成・
 ---
 name: skill-name
 description: スキルの説明
-model: sonnet
-effort: medium
+model: inherit
 shell: powershell
 ---
 ```
 
-- `model`, `effort`, `shell` は必須。
-- `model` は `sonnet` / `opus`、または `claude-opus-5-5` のような具体的なモデルID文字列を指定する（**必須**）。`haiku` は禁止（200k コンテキストのため、1M の親セッションでコンテキストオーバーの懸念がある）。`fable` はユーザーが明示的に指定した場合のみ使用する。モデル選択基準は下記「モデル選択基準」を参照。スキル・エージェント共通のルール。
-- `effort` は `low` / `medium` / `high` から選択。`shell` は `powershell` を指定する。
+- `model`, `shell` は必須。`shell` は `powershell` を指定する。
+- **`effort` はインライン実行のスキルでは指定しない。** 公式 docs（code.claude.com/docs/en/skills の frontmatter 表）に「Overrides the session effort level」とあるのみで、上書きの持続範囲（ターン単位か否か）や `inherit` 相当の値が明記されていないため、model と同じ原則（セッション設定を上書きしない）を適用する。`effort` を指定してよいのは `context: fork` のスキルとエージェントのみ（`low` / `medium` / `high` から選択）。
+
+### model 指定の原則
+
+- **インライン実行のスキル（`context: fork` なし）は `model: inherit` を必須とする。** スキルの `model:` 上書きは「現在のターンの残り」に適用される（公式 docs の skills frontmatter 表「The override applies for the rest of the current turn」）ため、スキル実行後の同一ターンで行うコーディング等の後続作業が意図しないモデルで実行される。また、Claude が Skill ツールで自発的に呼び出した場合は `model:` / `effort:` が無視される既知バグがあり（anthropics/claude-code#98898）、挙動が不定になる。
+- **model を指定してよいのは、`context: fork` のスキルとエージェントのみ。** fork スキルは単体で完結し、`AskUserQuestion` を使わず、会話文脈に依存しないものに限る（fork はサブエージェントとして隔離実行され、会話履歴を引き継がない）。
+  - fork スキルの `model:` は fork 先サブエージェントのモデルになる（公式 docs: "With `context: fork`, the value sets the forked subagent's model instead"）。ただし Claude の Skill ツール経由で呼び出した場合にも適用されるかは本プラグインでは未検証（#79664 では有効と報告されている）。fork スキルを追加する際はサブエージェントの transcript の `model` で実測確認すること。
+- `model` には `sonnet` / `opus` / `haiku`、または `claude-opus-5-5` のような具体的なモデルID文字列を指定できる。`fable` はユーザーが明示的に指定した場合のみ使用する。
+- `haiku` は、fork スキル・エージェントで、コーディング・リポジトリ内ファイル編集・破壊的操作・品質判断を含まない用途に限り許可する。`effort` は `medium` 以上とする。前提: Anthropic API かつ Claude Code v2.1.293 以上（他プロバイダや旧バージョンでは Haiku 4.5（200k）に解決される）。
 
 ### モデル選択基準
 
+下表は `context: fork` のスキルとエージェントに適用する（インライン実行のスキルは `model: inherit`）。
+
 | 用途 | model |
 |---|---|
-| 定型・オーケストレーション系のスキル | `sonnet` |
+| 定型・オーケストレーション系 | `sonnet` |
+| 非コーディング用途の定型処理（リポジトリ内ファイル編集・破壊的操作・品質判断を含まない。effort は medium 以上） | `haiku` |
 | 複雑な設計・実装（変更ファイル10未満かつ変更行数500行未満の目安） | `sonnet` |
 | 複雑な設計・実装（据え置き対象） | `opus`（必要に応じて具体 ID を個別指定） |
 | 基本的なレビュー・複雑な設計判断 | `opus` をデフォルトとする |
@@ -134,7 +143,6 @@ plan モードで ExitPlanMode を呼ぶ**前に**、plan-reviewer エージェ�
 | スキル | `approve-pr` | PR 承認・マージ・完了確認・ブランチ戻し |
 | スキル | `check-review` | PR レビューコメント取得・指摘対応支援 |
 | スキル | `pr-review` | PR レビュー実行（pr-reviewer エージェント起動） |
-| スキル | `self-audit` | Claude Code 運用の自己改善監査 |
 | スキル | `design-prep` | 設計前提メモ作成（要件分析） |
 | スキル | `design-doc` | 設計書セット生成 |
 | スキル | `maven-build` | Maven ビルド実行 |
