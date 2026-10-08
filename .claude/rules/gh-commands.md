@@ -1,5 +1,5 @@
 ---
-version: "1.2.1"
+version: "1.3.0"
 has_placeholders: false
 description: "gh コマンド運用ルール（Issue/PR/CI/API）"
 ---
@@ -76,7 +76,7 @@ $desc = @'
 gh pr create --title "<title>" --body $desc --base <ターゲットブランチ>
 ```
 - `--base` でマージ先ブランチを指定。`<ターゲットブランチ>` はPJのメインブランチ（`main` / `develop` / `v5.2_BS` 等、PJごとに異なる）に置き換える。
-- ソースブランチの削除はマージ後に `git push origin --delete <ブランチ名>` で行う（作成時は不要）。
+- ソースブランチの削除はマージ後に `git push origin --delete <ブランチ名>` で行う（作成時は不要）。ただし保護ブランチ・既定ブランチは削除しない（詳細は後述「保護ブランチ・既定ブランチの削除防止」）。
 
 ### 既存 PR の確認
 ```powershell
@@ -129,9 +129,22 @@ gh pr review <PR番号> --approve
 $prSource = gh pr view <PR番号> --json headRefName --jq ".headRefName"
 gh pr merge <PR番号> --merge
 $state = gh pr view <PR番号> --json state --jq ".state"
-# MERGED を確認できた場合のみブランチ削除（確認失敗時は削除しない）
+# MERGED を確認できた場合のみブランチ削除判定へ（確認失敗時は削除しない）
 if ($state -eq "MERGED") {
-    git push origin --delete $prSource
+    # 保護ブランチ・既定ブランチは削除しない（詳細は後述）
+    $defaultBranch = gh repo view --json defaultBranchRef --jq ".defaultBranchRef.name"
+    $protected = gh api "repos/{owner}/{repo}/branches/$prSource" --jq ".protected" 2>$null
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($protected)) {
+        if ($protected -match '"status":\s*"404"') {
+            Write-Output "INFO: '$prSource' は既に削除済みのため削除不要です。"
+        } else {
+            Write-Output "WARN: '$prSource' の保護ブランチ判定に失敗したため、安全側に倒して削除をスキップします。"
+        }
+    } elseif ($protected -eq "true" -or $prSource -eq $defaultBranch) {
+        Write-Output "INFO: '$prSource' は保護ブランチまたは既定ブランチのため削除をスキップします。"
+    } else {
+        git push origin --delete $prSource
+    }
 } else {
     Write-Output "ERROR: PR の state が MERGED ではありません ('$state')。ブランチ削除を中止します。"
 }
@@ -148,9 +161,22 @@ PR 作成者＝責任者の場合、`--admin` でブランチ保護ルールを�
 $prSource = gh pr view <PR番号> --json headRefName --jq ".headRefName"
 gh pr merge <PR番号> --merge --admin
 $state = gh pr view <PR番号> --json state --jq ".state"
-# MERGED を確認できた場合のみブランチ削除（確認失敗時は削除しない）
+# MERGED を確認できた場合のみブランチ削除判定へ（確認失敗時は削除しない）
 if ($state -eq "MERGED") {
-    git push origin --delete $prSource
+    # 保護ブランチ・既定ブランチは削除しない（詳細は後述）
+    $defaultBranch = gh repo view --json defaultBranchRef --jq ".defaultBranchRef.name"
+    $protected = gh api "repos/{owner}/{repo}/branches/$prSource" --jq ".protected" 2>$null
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($protected)) {
+        if ($protected -match '"status":\s*"404"') {
+            Write-Output "INFO: '$prSource' は既に削除済みのため削除不要です。"
+        } else {
+            Write-Output "WARN: '$prSource' の保護ブランチ判定に失敗したため、安全側に倒して削除をスキップします。"
+        }
+    } elseif ($protected -eq "true" -or $prSource -eq $defaultBranch) {
+        Write-Output "INFO: '$prSource' は保護ブランチまたは既定ブランチのため削除をスキップします。"
+    } else {
+        git push origin --delete $prSource
+    }
 } else {
     Write-Output "ERROR: PR の state が MERGED ではありません ('$state')。ブランチ削除を中止します。"
 }
@@ -158,6 +184,17 @@ if ($state -eq "MERGED") {
 
 - `--admin` は Repository Admin 以上の権限が必要。
 - 承認ステップをスキップして直接マージする。
+
+### 保護ブランチ・既定ブランチの削除防止
+
+`git push origin --delete` の前に、head が保護ブランチまたは既定ブランチでないことを確認する。マージ先が既定ブランチ以外の PR では、head が長期運用の保護ブランチであるケースがあるため（逆マージ PR の head は本判定を行わず常に削除しない。詳細は `pr-approval.md` を参照）。
+
+```powershell
+gh api "repos/{owner}/{repo}/branches/<ブランチ名>" --jq ".protected"
+# true / false（文字列）。API エラー時は判定不能のため削除しない
+```
+
+`.protected` の取得に失敗した場合、レスポンスに `"status":"404"` を含む（実機確認済み）ときは「既に削除済みのため削除不要」として INFO で扱う（`delete_branch_on_merge` 有効なリポジトリではマージ直後に GitHub 側で削除済みのことがある）。それ以外の理由での失敗（API エラー・空文字）は安全側に倒して削除しない（WARN）。既定ブランチ自体が head の場合も削除対象外とする。
 
 ### マージ完了の確認（**必須**）
 
